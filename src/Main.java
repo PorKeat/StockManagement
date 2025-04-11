@@ -10,6 +10,35 @@ public class Main {
         System.out.print(">> Press Enter to continue... ");
         scanner.nextLine();
     }
+    private static void availableStocks(boolean check) {
+        System.out.print("[*] Stock number available: ");
+        for (int i = 0; i < stock.length; i++) {
+            if(check){
+                if (Arrays.deepToString(stock[i]).contains("EMPTY")){
+                    System.out.print((i + 1) + " | ");
+                }
+            }else{
+                System.out.print((i + 1) + " | ");
+            }
+        }
+        System.out.print("\b\b\n");
+    }
+    private static void catalogue(int stockIndex) {
+        System.out.print("Stock [" + (stockIndex + 1) + "] => ");
+        boolean checkStock = true;
+        for (int j = 0; j < stock[stockIndex].length; j++) {
+            if (stock[stockIndex][j].contains("EMPTY")) {
+                System.out.print("[ " + (j + 1) + " - EMPTY ] ");
+                checkStock = false;
+            } else {
+                System.out.print("[ " + stock[stockIndex][j] + " ] ");
+            }
+        }
+        if (checkStock) {
+            System.out.print(" - FULL STOCK");
+        }
+        System.out.println();
+    }
     private static void view(){
         System.out.println("=".repeat(10)+"| Stock Management System |"+"=".repeat(10));
         System.out.println("[1]. Set up Stock");
@@ -38,21 +67,7 @@ public class Main {
     private static void viewStock(){
         System.out.println("=".repeat(15)+"| View Stock |"+"=".repeat(15));
         for (int i = 0; i < stock.length; i++) {
-            System.out.print("Stock [" + (i+1) + "] => ");
-            boolean checkStock = true;
-            for (int j = 0; j < stock[i].length; j++) {
-                if (stock[i][j].contains("EMPTY")) {
-                    System.out.print("[ " + (j+1) + " - EMPTY ] ");
-                    checkStock = false;
-                }
-                else {
-                    System.out.print("[ " + stock[i][j] + " ] ");
-                }
-            }
-            if (checkStock) {
-                System.out.print(" - FULL STOCK");
-            }
-            System.out.println();
+            catalogue(i);
         }
         System.out.println("=".repeat(44));
     }
@@ -61,27 +76,16 @@ public class Main {
         System.out.println("=".repeat(10)+"| Insert Product to Stock |"+"=".repeat(10));
         try {
             do{
-                System.out.print("[*] Stock number available: ");
-                for (int i = 0; i < stock.length; i++) {
-                    System.out.print((i+1)+" | ");
-                }
-                System.out.print("\b\b\n[+] Insert stock number: ");
+                availableStocks(true);
+                System.out.print("[+] Insert stock number: ");
                 r = scanner.nextInt();
                 if (r < 1 || r > stock.length || !Arrays.deepToString(stock[r-1]).contains("EMPTY")) {
                     System.out.println("[!] Invalid Input");
                 }
             }while(r < 1 || r > stock.length || !Arrays.deepToString(stock[r-1]).contains("EMPTY") );
-            System.out.print("Stock [" + (r) + "] => ");
-            for(int j = 0; j < stock[r-1].length; j++) {
-                if (stock[r-1][j].contains("EMPTY")) {
-                    System.out.print("[ " + (j+1) + " - EMPTY ] ");
-                }
-                else {
-                    System.out.print("[ " + stock[r-1][j] + " ] ");
-                }
-            }
+            catalogue(r-1);
             do {
-                System.out.print("\n[*] Catalogue numbers available: ");
+                System.out.print("[*] Catalogue numbers available: ");
                 for (int j = 0; j < stock[r-1].length; j++) {
                     if (stock[r-1][j].contains("EMPTY")) {
                         System.out.print((j+1)+" | ");
@@ -89,38 +93,74 @@ public class Main {
                 }
                 System.out.print("\b\b\n[+] Insert number of catalogue to put product: ");
                 c = scanner.nextInt();
-                if (c < 1 || c > stock[r-1].length) {
+                if (c < 1 || c > stock[r-1].length || !stock[r-1][c-1].contains("EMPTY")) {
                     System.out.println("[!] Invalid Input");
                 }
-            }while(c < 1 || c > stock[r-1].length);
+            }while(c < 1 || c > stock[r-1].length || !stock[r-1][c-1].contains("EMPTY"));
             scanner.nextLine();
             System.out.print("[+] Insert product name: ");
             stock[r-1][c-1] = scanner.nextLine();
             System.out.println("[+] Product has been inserted");
         }catch(Exception e){
             System.out.println("[!] Product fail to inserted");
+        }finally {
+            press();
         }
-        press();
         System.out.println("\b\b\n"+"=".repeat(37));
     }
-    private static void updateProductToStock(){}
-    private static void deleteProductFromStock(){}
+    private static void updateProductToStock(){
+        System.out.println("=".repeat(10)+"| Update Product In Stock |"+"=".repeat(10));
+        availableStocks(false);
+        System.out.print("[+] Insert stock number to update product: ");
+        int r = scanner.nextInt();
+        catalogue(r-1);
+        scanner.nextLine();
+        System.out.print("\b\b\n[+] Insert product name to update new one: ");
+        String oldName = scanner.nextLine();
+        if (Arrays.deepToString(stock[r-1]).contains(oldName)) {
+            System.out.print("[+] Insert new product name to update: ");
+            stock[r-1][Arrays.toString(stock[r-1]).indexOf(oldName)] = scanner.nextLine();
+            System.out.println("[+] Product has been updated");
+        }else{
+            System.out.println("[!] Product name not found");
+        }
+
+    }
+    private static void deleteProductFromStock(){
+        System.out.println("=".repeat(10)+"| Delete Product From Stock |"+"=".repeat(10));
+        availableStocks(false);
+        System.out.print("[+] Insert stock number to delete product: ");
+        int r = scanner.nextInt();
+        catalogue(r-1);
+        scanner.nextLine();
+        System.out.print("\b\b\n[+] Insert product name to delete: ");
+        String oldName = scanner.nextLine();
+        if (Arrays.deepToString(stock[r-1]).contains(oldName)) {
+            stock[r-1][Arrays.toString(stock[r-1]).indexOf(oldName)] = Arrays.toString(stock[r-1]).indexOf(oldName)+" - EMPTY";
+            System.out.println("[+] Product has been deleted");
+        }
+    }
     private static void viewHistory(){}
 
 
     public static void main(String[] args) {
         view();
         while(true){
-            System.out.print("[+] Insert option: ");
-            int op = new Scanner(System.in).nextInt();
-            switch(op){
-                case 1-> setUpStock();
-                case 2-> viewStock();
-                case 3-> insertProductToStock();
-                case 4-> updateProductToStock();
-                case 5-> deleteProductFromStock();
-                case 6-> viewHistory();
-                case 7-> System.exit(0 );
+            try {
+                System.out.print("[+] Insert option: ");
+                int op = new Scanner(System.in).nextInt();
+                switch(op){
+                    case 1-> setUpStock();
+                    case 2-> viewStock();
+                    case 3-> insertProductToStock();
+                    case 4-> updateProductToStock();
+                    case 5-> deleteProductFromStock();
+                    case 6-> viewHistory();
+                    case 7-> System.exit(0 );
+                }
+            }catch(Exception e){
+                System.out.println("[!] Invalid Input");
+                press();
             }
         }
     }

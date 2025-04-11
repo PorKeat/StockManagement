@@ -1,14 +1,21 @@
+
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Main {
     private static final Scanner scanner = new Scanner(System.in);
     private static String[][] stock;
-    private static String[][] history;
+    private static String[] history = new String[0];
 
     private static void press(){
         System.out.print(">> Press Enter to continue... ");
         scanner.nextLine();
+    }
+    private static void resizeHistory(){
+        String[] newHistory = new String[history.length+1];
+        System.arraycopy(history, 0, newHistory, 0, history.length);
+        history = newHistory;
     }
     private static void availableStocks(boolean check) {
         System.out.print("[*] Stock number available: ");
@@ -99,7 +106,12 @@ public class Main {
             }while(c < 1 || c > stock[r-1].length || !stock[r-1][c-1].contains("EMPTY"));
             scanner.nextLine();
             System.out.print("[+] Insert product name: ");
-            stock[r-1][c-1] = scanner.nextLine();
+            String name = scanner.nextLine();
+            stock[r-1][c-1] = name;
+            Date now = new Date();
+            String dateString = now.toString();
+            resizeHistory();
+            history[history.length-1] = "[*] INSERTED AT: " + dateString + " | Product Name: [" + name + "]";
             System.out.println("[+] Product has been inserted");
         }catch(Exception e){
             System.out.println("[!] Product fail to inserted");
@@ -117,12 +129,24 @@ public class Main {
         scanner.nextLine();
         System.out.print("\b\b\n[+] Insert product name to update new one: ");
         String oldName = scanner.nextLine();
-        if (Arrays.deepToString(stock[r-1]).contains(oldName)) {
-            System.out.print("[+] Insert new product name to update: ");
-            stock[r-1][Arrays.toString(stock[r-1]).indexOf(oldName)] = scanner.nextLine();
-            System.out.println("[+] Product has been updated");
-        }else{
+        boolean check = false;
+        for (int i = 0; i < stock[r-1].length; i++) {
+            if (stock[r-1][i].contains(oldName)) {
+                System.out.print("[+] Insert new product name to update: ");
+                String newName = scanner.nextLine();
+                stock[r-1][i] = newName;
+                Date now = new Date();
+                String dateString = now.toString();
+                resizeHistory();
+                history[history.length-1] = "[*] UPDATED AT: " + dateString + " | Product Name: [" + oldName+" -> " + newName + "]";
+                System.out.println("[+] Product has been updated");
+                check = true;
+                break;
+            }
+        }
+        if(!check){
             System.out.println("[!] Product name not found");
+            press();
         }
 
     }
@@ -134,14 +158,35 @@ public class Main {
         catalogue(r-1);
         scanner.nextLine();
         System.out.print("\b\b\n[+] Insert product name to delete: ");
-        String oldName = scanner.nextLine();
-        if (Arrays.deepToString(stock[r-1]).contains(oldName)) {
-            stock[r-1][Arrays.toString(stock[r-1]).indexOf(oldName)] = Arrays.toString(stock[r-1]).indexOf(oldName)+" - EMPTY";
-            System.out.println("[+] Product has been deleted");
+        String name = scanner.nextLine();
+        boolean check = false;
+        for (int i = 0; i < stock[r-1].length; i++) {
+            if (stock[r-1][i].contains(name)) {
+                stock[r-1][i] = (i+1) + " - EMPTY";
+                Date now = new Date();
+                String dateString = now.toString();
+                resizeHistory();
+                history[history.length-1] = "[*] DELETED AT: " + dateString + " | Product Name: [" +name+ "]";
+                System.out.println("[+] Product has been deleted");
+                check = true;
+                break;
+            }
+        }
+        if(!check){
+            System.out.println("[!] Product name not found");
+            press();
         }
     }
-    private static void viewHistory(){}
-
+    private static void viewHistory() {
+        System.out.println("=".repeat(15) + "| View History |" + "=".repeat(15));
+        for (String s : history) {
+            if(s == null){
+                continue;
+            }
+            System.out.println(s);
+        }
+        System.out.println("=".repeat(44));
+    }
 
     public static void main(String[] args) {
         view();

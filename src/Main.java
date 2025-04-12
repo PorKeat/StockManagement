@@ -11,6 +11,7 @@ public class Main {
     private static void press(){
         System.out.print(">> Press Enter to continue... ");
         scanner.nextLine();
+        System.out.println();
     }
     private static void resizeHistory(){
         String[] newHistory = new String[history.length+1];

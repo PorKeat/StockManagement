@@ -8,10 +8,20 @@ public class Main {
     private static String[][] stock;
     private static String[] history = new String[0];
 
+
     private static void press(){
         System.out.print(">> Press Enter to continue... ");
         scanner.nextLine();
-        System.out.println();
+    }
+    private static boolean check(){
+        for (String[] s : stock) {
+            for (String item : s) {
+                if (!item.contains("EMPTY")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     private static void resizeHistory(){
         String[] newHistory = new String[history.length+1];
@@ -26,7 +36,16 @@ public class Main {
                     System.out.print((i + 1) + " | ");
                 }
             }else{
-                System.out.print((i + 1) + " | ");
+                boolean hasStock = false;
+                for (String item : stock[i]) {
+                    if (!item.contains("EMPTY")) {
+                        hasStock = true;
+                        break;
+                    }
+                }
+                if (hasStock) {
+                    System.out.print((i + 1) + " | ");
+                }
             }
         }
         System.out.print("\b\b\n");
@@ -122,60 +141,69 @@ public class Main {
         System.out.println("\b\b\n"+"=".repeat(37));
     }
     private static void updateProductToStock(){
-        System.out.println("=".repeat(10)+"| Update Product In Stock |"+"=".repeat(10));
-        availableStocks(false);
-        System.out.print("[+] Insert stock number to update product: ");
-        int r = scanner.nextInt();
-        catalogue(r-1);
-        scanner.nextLine();
-        System.out.print("\b\b\n[+] Insert product name to update new one: ");
-        String oldName = scanner.nextLine();
-        boolean check = false;
-        for (int i = 0; i < stock[r-1].length; i++) {
-            if (stock[r-1][i].contains(oldName)) {
-                System.out.print("[+] Insert new product name to update: ");
-                String newName = scanner.nextLine();
-                stock[r-1][i] = newName;
-                Date now = new Date();
-                String dateString = now.toString();
-                resizeHistory();
-                history[history.length-1] = "[*] UPDATED AT: " + dateString + " | Product Name: [" + oldName+" -> " + newName + "]";
-                System.out.println("[+] Product has been updated");
-                check = true;
-                break;
+        boolean checkStock = check();
+        if (checkStock) {
+            System.out.println("=".repeat(10)+"| Update Product In Stock |"+"=".repeat(10));
+            availableStocks(false);
+            System.out.print("[+] Insert stock number to update product: ");
+            int r = scanner.nextInt();
+            catalogue(r-1);
+            scanner.nextLine();
+            System.out.print("\b\b\n[+] Insert product name to update new one: ");
+            String oldName = scanner.nextLine();
+            boolean check = false;
+            for (int i = 0; i < stock[r-1].length; i++) {
+                if (stock[r-1][i].equals(oldName) && !stock[r-1][i].contains("EMPTY")) {
+                    System.out.print("[+] Insert new product name to update: ");
+                    String newName = scanner.nextLine();
+                    stock[r - 1][i] = newName;
+                    Date now = new Date();
+                    String dateString = now.toString();
+                    resizeHistory();
+                    history[history.length - 1] = "[*] UPDATED AT: " + dateString + " | Product Name: [" + oldName + " -> " + newName + "]";
+                    System.out.println("[+] Product has been updated");
+                    check = true;
+                    break;
+                }
             }
+            if(!check){
+                System.out.println("[!] Product name not found");
+                press();
+            }
+        }else{
+            System.out.println("[!] No products available");
         }
-        if(!check){
-            System.out.println("[!] Product name not found");
-            press();
-        }
-
     }
     private static void deleteProductFromStock(){
-        System.out.println("=".repeat(10)+"| Delete Product From Stock |"+"=".repeat(10));
-        availableStocks(false);
-        System.out.print("[+] Insert stock number to delete product: ");
-        int r = scanner.nextInt();
-        catalogue(r-1);
-        scanner.nextLine();
-        System.out.print("\b\b\n[+] Insert product name to delete: ");
-        String name = scanner.nextLine();
-        boolean check = false;
-        for (int i = 0; i < stock[r-1].length; i++) {
-            if (stock[r-1][i].contains(name)) {
-                stock[r-1][i] = (i+1) + " - EMPTY";
-                Date now = new Date();
-                String dateString = now.toString();
-                resizeHistory();
-                history[history.length-1] = "[*] DELETED AT: " + dateString + " | Product Name: [" +name+ "]";
-                System.out.println("[+] Product has been deleted");
-                check = true;
-                break;
+        boolean checkStock = check();
+        if (checkStock) {
+            System.out.println("=".repeat(10)+"| Delete Product From Stock |"+"=".repeat(10));
+            availableStocks(false);
+            System.out.print("[+] Insert stock number to delete product: ");
+            int r = scanner.nextInt();
+            catalogue(r-1);
+            scanner.nextLine();
+            System.out.print("\b\b\n[+] Insert product name to delete: ");
+            String name = scanner.nextLine();
+            boolean check = false;
+            for (int i = 0; i < stock[r-1].length; i++) {
+                if (stock[r-1][i].equals(name) && !stock[r-1][i].contains("EMPTY")) {
+                    stock[r-1][i] = (i+1) + " - EMPTY";
+                    Date now = new Date();
+                    String dateString = now.toString();
+                    resizeHistory();
+                    history[history.length-1] = "[*] DELETED AT: " + dateString + " | Product Name: [" +name+ "]";
+                    System.out.println("[+] Product has been deleted");
+                    check = true;
+                    break;
+                }
             }
-        }
-        if(!check){
-            System.out.println("[!] Product name not found");
-            press();
+            if(!check){
+                System.out.println("[!] Product name not found");
+                press();
+            }
+        }else {
+            System.out.println("[!] No products available");
         }
     }
     private static void viewHistory() {
@@ -190,19 +218,24 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        view();
-        while(true){
+        while(true) {
             try {
+                view();
                 System.out.print("[+] Insert option: ");
                 int op = new Scanner(System.in).nextInt();
-                switch(op){
-                    case 1-> setUpStock();
-                    case 2-> viewStock();
-                    case 3-> insertProductToStock();
-                    case 4-> updateProductToStock();
-                    case 5-> deleteProductFromStock();
-                    case 6-> viewHistory();
-                    case 7-> System.exit(0 );
+                if (stock == null) {
+                    System.out.println("[!] Setup stock first");
+                    press();
+                    continue;
+                }
+                switch (op) {
+                    case 1 -> setUpStock();
+                    case 2 -> viewStock();
+                    case 3 -> insertProductToStock();
+                    case 4 -> updateProductToStock();
+                    case 5 -> deleteProductFromStock();
+                    case 6 -> viewHistory();
+                    case 7 -> System.exit(0);
                 }
             }catch(Exception e){
                 System.out.println("[!] Invalid Input");
@@ -210,5 +243,4 @@ public class Main {
             }
         }
     }
-
 }

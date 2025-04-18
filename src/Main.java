@@ -223,11 +223,6 @@ public class Main {
                 view();
                 System.out.print("[+] Insert option: ");
                 int op = new Scanner(System.in).nextInt();
-                if (stock == null) {
-                    System.out.println("[!] Setup stock first");
-                    press();
-                    continue;
-                }
                 switch (op) {
                     case 1 -> setUpStock();
                     case 2 -> viewStock();

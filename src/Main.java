@@ -1,6 +1,7 @@
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -207,14 +208,19 @@ public class Main {
         }
     }
     private static void viewHistory() {
-        System.out.println("=".repeat(15) + "| View History |" + "=".repeat(15));
-        for (String s : history) {
-            if(s == null){
-                continue;
+        System.out.println("History:" + Arrays.toString(history));
+        if (history.length == 0) {
+            System.out.println("[!] Dont have history yet");
+        }else{
+            System.out.println("=".repeat(15) + "| View History |" + "=".repeat(15));
+            for (String s : history) {
+                if(s == null){
+                    continue;
+                }
+                System.out.println(s);
             }
-            System.out.println(s);
+            System.out.println("=".repeat(44));
         }
-        System.out.println("=".repeat(44));
     }
 
     public static void main(String[] args) {
@@ -232,7 +238,10 @@ public class Main {
                     case 6 -> viewHistory();
                     case 7 -> System.exit(0);
                 }
-            }catch(Exception e){
+            }catch(NullPointerException e){
+                System.out.println("[!] Insert Stock First");
+                press();
+            }catch(InputMismatchException e){
                 System.out.println("[!] Invalid Input");
                 press();
             }

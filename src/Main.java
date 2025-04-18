@@ -79,18 +79,22 @@ public class Main {
         System.out.println("=".repeat(47));
     }
     private static void setUpStock() {
-        System.out.print("[+] Insert number of stock items: ");
-        int r = scanner.nextInt();
-        stock = new String[r][];
-        for (int i = 0; i < r; i++) {
-            System.out.print("[+] Insert number of catalogue on stock ["+(i+1)+"]: ");
-            int c = scanner.nextInt();
-            stock[i] = new String[c];
-            for (int j = 0; j < c; j++) {
-                stock[i][j] = (j+1)+" - EMPTY";
+        if(stock == null){
+            System.out.print("[+] Insert number of stock items: ");
+            int r = scanner.nextInt();
+            stock = new String[r][];
+            for (int i = 0; i < r; i++) {
+                System.out.print("[+] Insert number of catalogue on stock ["+(i+1)+"]: ");
+                int c = scanner.nextInt();
+                stock[i] = new String[c];
+                for (int j = 0; j < c; j++) {
+                    stock[i][j] = (j+1)+" - EMPTY";
+                }
             }
+            viewStock();
+        }else{
+            System.out.println("[!] Stock Already Setup ");
         }
-        viewStock();
     }
     private static void viewStock(){
         System.out.println("=".repeat(15)+"| View Stock |"+"=".repeat(15));
